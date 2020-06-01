@@ -1220,6 +1220,8 @@ def _parse_args():
         args.do_batchupgrade = True
     else:
         args.do_batchupgrade = False
+    if args.pg_ip:
+        args.do_batchupgrade = False
     # region_indexer is default True for everything but demos
     if args.region_indexer is not None:
         if args.region_indexer[0].lower() == 'y':

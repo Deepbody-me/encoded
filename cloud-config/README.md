@@ -108,34 +108,74 @@ Organization deployment configuration and build files
 ### Demo Cluster(es-wait) with open postgres port: es-nodes-template.yml and app-pg-template.yml
 
 ###### This command builds the Elasticsearch cluster
-    $ export CLUSTER_NAME='encd-dev-open'
+    $ export CLUSTER_NAME='v101x0-pretest'
     $ bin/deploy --full-build --cluster-name "$CLUSTER_NAME" --es-wait
 
-        ### Output
-        Deploying es-nodes
-        $ bin/deploy --full-build --cluster-name "$CLUSTER_NAME" --es-wait
-        Create instance and wait for running state
-        # Deploying Head ES Node(172.31.29.190): encd-dev-open-datamaster
+        ### Output ###
+            Deploying es-nodes with indexing=True
+            $ bin/deploy --cluster-name v101x0-pretest --es-wait
+            Create instance and wait for running state
+
+            Deploying Head ES Node(172.31.26.243): v101x0-pretest-datamaster
+             ssh ubuntu@i-07ee1fdef5a185169.instance.encodedcc.org
+
+            Run the following command to view es head deployment log.
+            ssh ubuntu@ec2-34-216-125-80.us-west-2.compute.amazonaws.com 'tail -f /var/log/cloud-init-output.log'
+
+            Run the following command to view this es node deployment log.
+            ssh ubuntu@ec2-35-164-150-246.us-west-2.compute.amazonaws.com 'tail -f /var/log/cloud-init-output.log'
+            ES node1 ssh:
+             ssh ubuntu@ec2-54-200-70-216.us-west-2.compute.amazonaws.com
+            ES node2 ssh:
+             ssh ubuntu@ec2-34-223-7-20.us-west-2.compute.amazonaws.com
+            ES node3 ssh:
+             ssh ubuntu@ec2-54-191-254-114.us-west-2.compute.amazonaws.com
+            ES node4 ssh:
+             ssh ubuntu@ec2-54-185-130-125.us-west-2.compute.amazonaws.com
+            Done
         ###
 
-    The IP address is the --es-ip used to deploy a frontend.
-    $ export ES_IP='172.31.29.190'
+    The IP address after 'Deploying Head ES Node' is the --es-ip used to deploy a frontend.
+    $ export ES_IP='172.31.26.243'
 
 ###### This command builds the front-end machine that connects to the specified elasticsearch cluster with an open postgres port.
-    $ bin/deploy --full-build --cluster-name "$CLUSTER_NAME" --es-ip "$ES_IP" --pg-open
+    $ bin/deploy --cluster-name "$CLUSTER_NAME" --es-ip "$ES_IP" --pg-open
     
-        ### Output
-        Deploying app-pg
-        $ bin/deploy --full-build --cluster-name encd-dev-open --es-ip 172.31.29.190 --pg-open
-        Create instance and wait for running state
+        ### Output ###
+            Deploying app-pg with indexing=True
+            $ bin/deploy --cluster-name v101x0-pretest --es-ip 172.31.26.243 --pg-open
+            Create instance and wait for running state
 
-        Deploying Frontend(172.31.25.255): https://encd-dev.demo.encodedcc.org
+            Deploying Frontend(172.31.29.250): https://v101x0-pretest.demo.encodedcc.org
+             ssh ubuntu@i-0d3c251746a95bfc7.instance.encodedcc.org
+
+
+            Run the following command to view the deployment log.
+            ssh ubuntu@ec2-34-217-43-68.us-west-2.compute.amazonaws.com 'tail -f /var/log/cloud-init-output.log'
+            Done
         ###
 
+    The IP address after 'Deploying Head ES Node' is the --es-ip used to deploy a frontend.
+    $ export PG_IP='172.31.29.250'
 
 ### Demo with postgres and elasticsearch pointing at Demo Cluster: app-template.yml
-    $ export PG_IP='172.31.25.255'
-    $ bin/deploy --full-build -n app-pointing-at-pg-es --cluster-name "$CLUSTER_NAME" --es-ip "$ES_IP" --pg-ip "$PG_IP"
+    export FE_NAME_01='v101x0-pretest-fe1'
+    $ bin/deploy -n "$FE_NAME_01" --cluster-name "$CLUSTER_NAME" --es-ip "$ES_IP" --pg-ip "$PG_IP"
+
+        ### Output ###
+            Deploying app-es with indexing=True
+            $ bin/deploy -n v101x0-pretest-fe1 --cluster-name  --es-ip 172.31.26.243 --pg-ip 172.31.29.250
+            Create instance and wait for running state
+
+            Deploying Demo(172.31.25.53): https://v101x0-pretest-fe1.demo.encodedcc.org
+             ssh ubuntu@i-02ab2c54b46ab7f2e.instance.encodedcc.org
+            ssh and tail:
+             ssh ubuntu@ec2-34-210-86-140.us-west-2.compute.amazonaws.com 'tail -f /var/log/cloud-init-output.log'
+            Done
+        ###
+
+    export FE_NAME_02='v101x0-pretest-fe2'
+    $ bin/deploy -n "$FE_NAME_02" --cluster-name "$CLUSTER_NAME" --es-ip "$ES_IP" --pg-ip "$PG_IP"
 
 
 ### (TBD) Demo with elasticsearch pointing at rds version of postgres: app-es-template.yml
