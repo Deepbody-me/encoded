@@ -179,11 +179,10 @@ Organization deployment configuration and build files
 
 
 ### Cost savings:
-    1. Elasticsearch
-    2. Database
-    3. Indexing
-    4. App
-    5. 
+    1. (5)Elastics - Cluster
+    2. (1)Database - App
+    3. (1)Indexing - App
+    4. (1)FrontEnd - App(s)
     
 
 
