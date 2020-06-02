@@ -178,4 +178,13 @@ Organization deployment configuration and build files
     $ bin/deploy -n "$FE_NAME_02" --cluster-name "$CLUSTER_NAME" --es-ip "$ES_IP" --pg-ip "$PG_IP"
 
 
+### Cost savings:
+    1. Elasticsearch
+    2. Database
+    3. Indexing
+    4. App
+    5. 
+    
+
+
 ### (TBD) Demo with elasticsearch pointing at rds version of postgres: app-es-template.yml
