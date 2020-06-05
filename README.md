@@ -1,6 +1,6 @@
-export CLUSTER_NAME='open-pg-fe' && bin/deploy -n "$CLUSTER_NAME" -b ENCD-AAAA-launch-remote-indexing --do-batchupgrade no --pg-open --dry-run
-export head_ip='172.31.24.173' && bin/deploy -n "$CLUSTER_NAME-indexer" --cluster-name "$CLUSTER_NAME"  -b ENCD-AAAA-launch-remote-indexing --do-batchupgrade no --pg-ip "$head_ip" --es-ip "$head_ip" --dry-run
-git add -u && git commit -m 'testing' && git push origin ENCD-AAAA-launch-remote-indexing:ENCD-AAAA-launch-remote-indexing
+export CLUSTER_NAME='open-pg-fe' && bin/deploy -n "$CLUSTER_NAME" -b SNO-AAA-launch-remote-indexing --do-batchupgrade no --pg-open --dry-run
+export head_ip='172.31.24.173' && bin/deploy -n "$CLUSTER_NAME-indexer" --cluster-name "$CLUSTER_NAME"  -b SNO-AAA-launch-remote-indexing --do-batchupgrade no --pg-ip "$head_ip" --es-ip "$head_ip" --dry-run
+git add -u && git commit -m 'testing' && git push origin SNO-AAA-launch-remote-indexing:SNO-AAA-launch-remote-indexing
 ENCODE Metadata Database
 ========================
 
