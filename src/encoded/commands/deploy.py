@@ -175,6 +175,7 @@ def _tag_ec2_instance(
         # the role tags for data machines are used for nagios monitoring
         tags_dict['Role'] += '-data'
         tags_dict['elasticsearch'] = 'yes'
+        tags_dict['kibana'] = tag_data['kibana']
         tags_dict['auto_resize'] = 'na'
         tags_dict['elastic_ip_swtich_datatime'] = 'na'
         if cluster_master:
@@ -382,6 +383,7 @@ def _get_instances_tag_data(main_args, build_type_template_name):
         'name': main_args.name,
         'username': None,
         'build_type': build_type_template_name,
+        'kibana': 'true' if main_args.kibana else 'false',
         'is_qa_demo': main_args.is_qa_demo,
     }
     instances_tag_data['commit'] = _get_commit_sha_for_branch(instances_tag_data['branch'])
@@ -455,6 +457,8 @@ def _get_run_args(main_args, instances_tag_data, config_yaml, is_tag=False):
         'ES_IP': main_args.es_ip,
         'ES_PORT': main_args.es_port,
         'ES_OPT_FILENAME': 'notused',
+        'KIBANA': 'false',
+        'MONITOR': 'true' if main_args.monitor else 'false',
         'FE_IP': main_args.fe_ip,
         'FULL_BUILD': main_args.full_build,
         'GIT_BRANCH': main_args.branch,
@@ -476,7 +480,7 @@ def _get_run_args(main_args, instances_tag_data, config_yaml, is_tag=False):
         'SCRIPTS_DIR': "{}/run-scripts".format(cc_dir),
         'WALE_S3_PREFIX': main_args.wale_s3_prefix,
     }
-    if build_type == 'es-nodes':
+    if build_type in  ['es-nodes', 'es-monitoring']:
         count = main_args.cluster_size
         security_groups = ['elasticsearch-https']
         iam_role = main_args.iam_role_es
@@ -493,6 +497,7 @@ def _get_run_args(main_args, instances_tag_data, config_yaml, is_tag=False):
             master_data_insert = copy.copy(data_insert)
             master_data_insert.update({
                 'ES_OPT_FILENAME': 'es-cluster-head.yml',
+                'KIBANA': 'true' if main_args.kibana else 'false'
             })
             master_user_data = _get_user_data(
                 config_yaml,
@@ -617,8 +622,10 @@ def _get_cloud_config_yaml(main_args):
         return None, None, None
     # Determine template 
     template_name = 'app-es-pg'
-    if main_args.es_elect or main_args.es_wait:
+    if (main_args.es_elect or main_args.es_wait) and not main_args.kibana:
         template_name = 'es-nodes'
+    elif (main_args.es_elect or main_args.es_wait) and main_args.kibana:
+        template_name = 'es-monitoring'
     elif main_args.cluster_name:
         if not main_args.es_ip == 'localhost' and main_args.pg_ip == '':
             # Standard cluster frontend with remote es and local pg
@@ -1026,6 +1033,10 @@ def _parse_args():
     )
     parser.add_argument('--fe-ip', default='localhost', help="Primary frontend ip address")
     parser.add_argument('--jvm-gigs', default='8', help="JVM Xms and Xmx gigs")
+
+    # Kibana monitoring
+    parser.add_argument('--kibana', action='store_true', help='Make monitoring cluster with kibana')
+    parser.add_argument('--monitor', action='store_true', help='Connect front-end to Kibana')
 
     # Database
     parser.add_argument('--postgres-version', default='11', help="Postegres version. '9.3' or '11'")
