@@ -462,6 +462,10 @@ def _get_run_args(main_args, instances_tag_data, config_yaml, is_tag=False):
                 'INDEX_PRIMARY': 'true',
                 'INDEX_VIS': 'true',
             })
+        if main_args.primary_indexing:
+            data_insert.update({
+                'INDEX_PRIMARY': 'true',
+            })
         user_data = _get_user_data(config_yaml, data_insert, main_args)
     run_args = {
         'count': count,
@@ -907,6 +911,11 @@ def _parse_args():
         '--no-indexing',
         action='store_true',
         help="Do not add indexing procs to apache"
+    )
+    parser.add_argument(
+        '--primary-indexing',
+        action='store_true',
+        help="Force primary indexing"
     )
 
     # Cluster
