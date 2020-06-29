@@ -551,8 +551,6 @@ class RegionIndexer(Indexer):
             # Could be a chrom never seen before!
             if not self.regions_es.indices.exists(key):
                 self.regions_es.indices.create(index=key, body=index_settings())
-
-            if not self.regions_es.indices.exists_type(index=key):
                 self.regions_es.indices.put_mapping(index=key, body=get_mapping(assembly))
 
             self.regions_es.index(index=key, body=doc, id=str(id))

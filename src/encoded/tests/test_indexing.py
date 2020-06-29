@@ -114,7 +114,6 @@ def test_indexing_simple(testapp, indexer_testapp):
 
 @pytest.mark.slow
 def test_indexing_workbook(testapp, indexer_testapp):
-    import pdb; pdb.set_trace()
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
     res = indexer_testapp.post_json('/index', {'record': True})
