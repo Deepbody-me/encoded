@@ -24,7 +24,7 @@ commands:
           command: |
             sudo apt-get update && sudo apt-get install apt-transport-https software-properties-common
             wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-            echo "deb https://artifacts.elastic.co/packages/7.6.2/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.6.2.list
+            echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
             curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
             curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
             sudo add-apt-repository -y ppa:openjdk-r/ppa
