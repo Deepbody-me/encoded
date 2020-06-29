@@ -95,9 +95,6 @@ def tsvreader(file):
 def get_mapping(assembly_name='hg19'):
     return {
         assembly_name: {
-            '_all': {
-                'enabled': False
-            },
             '_source': {
                 'enabled': True
             },
