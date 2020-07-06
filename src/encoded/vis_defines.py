@@ -1565,7 +1565,14 @@ class VisCache(object):
         if not self.es:
             return None
         if not self.es.indices.exists(self.index):
-            one_shard = {'settings':'index': {'number_of_shards': 1, 'max_result_window': 99999 }}}
+            one_shard = {
+                'settings': {
+                    'index': {
+                        'number_of_shards': 1, 
+                        'max_result_window': 99999
+                    }
+                }
+            }
             mapping = {'mappings': {"enabled": False}}
             self.es.indices.create(index=self.index, body=one_shard, wait_for_active_shards=1)
             self.es.indices.put_mapping(index=self.index, body=mapping)
