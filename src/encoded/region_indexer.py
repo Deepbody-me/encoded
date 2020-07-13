@@ -102,6 +102,7 @@ def get_mapping(assembly_name='hg19'):
                 'uuid': {
                     'type': 'keyword' # WARNING: to add local files this must be 'type': 'string'
                 },
+                'assembly': assembly_name,
                 'positions': {
                     'type': 'nested',
                     'properties': {
@@ -543,6 +544,7 @@ class RegionIndexer(Indexer):
         for key in regions:
             doc = {
                 'uuid': str(id),
+                'assembly': assembly,
                 'positions': regions[key]
             }
             # Could be a chrom never seen before!
@@ -565,7 +567,7 @@ class RegionIndexer(Indexer):
             self.regions_es.indices.create(index=self.residents_index, body=index_settings())
 
         if not self.regions_es.indices.exists_type(index=self.residents_index):
-            mapping = {'default': {"enabled": False}}
+            mapping = {'mappings': {"enabled": False}}
             self.regions_es.indices.put_mapping(index=self.residents_index, body=mapping)
 
         self.regions_es.index(index=self.residents_index, body=doc, id=str(id))
