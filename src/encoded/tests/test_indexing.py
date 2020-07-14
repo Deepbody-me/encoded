@@ -67,6 +67,7 @@ def DBSession(app):
 
 @pytest.fixture(autouse=True)
 def teardown(app, dbapi_conn):
+    app.registry['elasticsearch'].indices.delete('_all')
     from snovault.elasticsearch import create_mapping
     create_mapping.run(app)
     cursor = dbapi_conn.cursor()
