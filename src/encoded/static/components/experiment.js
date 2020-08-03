@@ -388,7 +388,7 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     const libraryDocs = [];
     let biosamples = [];
     if (isEnhancerExperiment) {
-        biosamples = _.compact(replicates.map((biosample)
+        biosamples = _.compact(biosamples.map((biosample)
         return null;
         }));
     } else {
