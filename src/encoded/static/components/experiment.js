@@ -344,7 +344,7 @@ DatasetConstructionPlatform.propTypes = {
 
 
 /**
- * Renders both Experiment and FunctionalCharacterizationExperiment objects.
+ * Renders Experiment, FunctionalCharacterizationExperiment, TransgenicEnhancerExperiment objects.
  */
 const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactContext) => {
     let condensedReplicates = [];
@@ -352,14 +352,18 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     const adminUser = !!(reactContext.session_properties && reactContext.session_properties.admin);
     const itemClass = globals.itemClass(context, 'view-item');
 
-    // Determine whether object is Experiment or FunctionalCharacterizationExperiment.
+    // Determine whether object is Experiment, FunctionalCharacterizationExperiment, or TransgenicEnhancerExperiment.
     const experimentType = context['@type'][0];
     const isFunctionalExperiment = experimentType === 'FunctionalCharacterizationExperiment';
+    const isEnhancerExperiment = experimentType === 'TransgenicEnhancerExperiment';
     let displayType;
     let displayTypeBreadcrumbs;
     if (isFunctionalExperiment) {
         displayTypeBreadcrumbs = 'Functional Characterization Experiments';
         displayType = 'Functional Characterization Experiment';
+    } else if (isEnhancerExperiment) {
+        displayTypeBreadcrumbs = 'Transgenic Enhancer Experiments';
+        displayType = 'Transgenic Enhancer Experiment';
     } else {
         displayTypeBreadcrumbs = 'Experiments';
         displayType = 'Experiment';
@@ -383,17 +387,23 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     // collect up library documents.
     const libraryDocs = [];
     let biosamples = [];
-    if (replicates.length > 0) {
-        biosamples = _.compact(replicates.map((replicate) => {
-            if (replicate.library) {
-                if (replicate.library.documents && replicate.library.documents.length > 0) {
-                    Array.prototype.push.apply(libraryDocs, replicate.library.documents);
-                }
-
-                return replicate.library.biosample;
-            }
-            return null;
+    if (isEnhancerExperiment) {
+        biosamples = _.compact(replicates.map((biosample)
+        return null;
         }));
+    } else {
+        if (replicates.length > 0) {
+            biosamples = _.compact(replicates.map((replicate) => {
+                if (replicate.library) {
+                    if (replicate.library.documents && replicate.library.documents.length > 0) {
+                        Array.prototype.push.apply(libraryDocs, replicate.library.documents);
+                    }
+
+                    return replicate.library.biosample;
+                }
+                return null;
+            }));
+        }
     }
 
     // Create platforms array from file platforms; ignore duplicate platforms.
@@ -478,7 +488,11 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     let nameTip = '';
     const names = organismNames.map((organismName, i) => {
         nameTip += (nameTip.length > 0 ? ' + ' : '') + organismName;
+        if (isEnhancerExperiment) {
+            nameQuery += `${nameQuery.length > 0 ? '&' : ''}biosamples.donor.organism.scientific_name=${organismName}`;
+        } else {
         nameQuery += `${nameQuery.length > 0 ? '&' : ''}replicates.library.biosample.donor.organism.scientific_name=${organismName}`;
+        }
         return <span key={i}>{i > 0 ? <span> + </span> : null}<i>{organismName}</i></span>;
     });
     const crumbs = [
@@ -678,6 +692,30 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                                 <div data-test="elements-cloning">
                                     <dt>Elements cloning</dt>
                                     <dd><a href={context.elements_cloning}>{globals.atIdToAccession(context.elements_cloning)}</a></dd>
+                                </div>
+                            : null}
+
+                            {context.elements_location ?
+                                <div data-test="elements-location">
+                                    <dt>Elements location</dt>
+                                    <dd>{`${context.elements_location.assembly} chr${context.elements_location.chromosome}:${context.elements_location.start}-${context.elements_location.end}`}</dd>
+                                </div>
+                            : null}
+
+                            {context.tissue_with_enhancer_activity && context.tissue_with_enhancer_activity.length > 0 ?
+                                <div data-test="tissue-with-enhancer-activity">
+                                    <dt>Tissues with enhancer activity</dt>
+                                    <dd>
+                                        <ul>
+                                            {context.tissue_with_enhancer_activity.map(tissue => (
+                                                <li key={tissue} className="multi-comma">
+                                                    <a href={tissue}>
+                                                        {globals.atIdToAccession(tissue)}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </dd>
                                 </div>
                             : null}
                         </dl>
