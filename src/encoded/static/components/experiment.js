@@ -388,11 +388,11 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     const libraryDocs = [];
     let biosamples = [];
     if (isEnhancerExperiment) {
-        biosamples = _.compact(biosamples.map((biosample) => {
-            return biosamples;
-        }
-        return null;
-        }));
+        if (biosamples > 0)
+            biosamples = _.compact(biosamples.map(biosample)
+                return biosamples;
+            return null;
+        });
     } else {
         if (replicates.length > 0) {
             biosamples = _.compact(replicates.map((replicate) => {

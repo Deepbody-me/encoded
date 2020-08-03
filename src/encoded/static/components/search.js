@@ -303,7 +303,7 @@ const ExperimentComponent = (props, reactContext) => {
 
     if (isEnhancerExperiment) {
         if (result.biosamples && result.biosamples.length > 0) {
-            biosamples = _.compact(result.biosamples.map(biosample) => biosample));
+            biosamples = _.compact(result.biosamples.map(biosample) => biosamples));
         }
     } else {
         if (result.replicates && result.replicates.length > 0) {
