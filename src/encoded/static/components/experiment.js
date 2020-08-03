@@ -388,7 +388,9 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     const libraryDocs = [];
     let biosamples = [];
     if (isEnhancerExperiment) {
-        biosamples = _.compact(biosamples.map((biosample)
+        biosamples = _.compact(biosamples.map((biosample) => {
+            return biosamples;
+        }
         return null;
         }));
     } else {
@@ -852,6 +854,7 @@ export default Experiment;
 
 globals.contentViews.register(Experiment, 'Experiment');
 globals.contentViews.register(Experiment, 'FunctionalCharacterizationExperiment');
+globals.contentViews.register(Experiment, 'TransgenicEnhancerExperiment');
 
 
 const replicateTableColumns = {
