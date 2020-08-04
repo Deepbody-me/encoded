@@ -64,11 +64,14 @@ export class JsonGraph {
     // Add edge to the graph architecture
     // source: ID of node for the edge to originate; corresponds to 'id' parm of addNode
     // target: ID of node for the edge to terminate
-    addEdge(source, target) {
+    // options: Object containing options to save in the edge that can be used later when displayed
+    addEdge(source, target, options) {
         const newEdge = {};
         newEdge.id = '';
         newEdge.source = source;
         newEdge.target = target;
+        newEdge.class = options ? options.class : '';
+        newEdge.metadata = _.clone(options);
         this.edges.push(newEdge);
     }
 
@@ -227,7 +230,7 @@ export class Graph extends React.Component {
 
         // Convert the edges
         jsonGraph.edges.forEach((edge) => {
-            graph.setEdge(edge.source, edge.target, { lineInterpolate: 'basis' });
+            graph.setEdge(edge.source, edge.target, { lineInterpolate: 'basis', class: edge.class });
         });
     }
 

@@ -118,9 +118,23 @@ g.cluster {
 }
 
 g.edgePath {
-    path {
+    path.path {
         stroke: #c0c0c0;
-        stroke-width: 1.5px;
+        stroke-width: 2px;
+    }
+
+    defs > marker > path {
+        fill: #c0c0c0;
+    }
+
+    &.highlighted {
+        path.path {
+            stroke: #00f;
+        }
+
+        defs > marker > path {
+            fill: #00f;
+        }
     }
 }
 

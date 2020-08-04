@@ -1719,7 +1719,9 @@ export function assembleGraph(files, highlightedFiles, dataset, options, loggedI
                 }
 
                 // Connect the file to the step, and the step to the derived_from files
-                jsonGraph.addEdge(stepId, fileNodeId);
+                const infoNodeId = infoNode && infoNode.id;
+                const fileNodeHighlighted = (infoNodeId === fileNodeId) || (infoNodeId === stepId);
+                jsonGraph.addEdge(stepId, fileNodeId, { class: fileNodeHighlighted ? 'highlighted' : '' });
                 file.derived_from.forEach((derivedFromAtId) => {
                     if (!allDerivedFroms[derivedFromAtId]) {
                         return;
@@ -1728,8 +1730,9 @@ export function assembleGraph(files, highlightedFiles, dataset, options, loggedI
                     if (derivedFromFile) {
                         // Not derived from a contributing file; just add edges normally.
                         const derivedFileId = `file:${derivedFromAtId}`;
+                        const derivedFileNodeHighlighted = (infoNodeId === derivedFileId) || (infoNodeId === stepId);
                         if (!jsonGraph.getEdge(derivedFileId, stepId)) {
-                            jsonGraph.addEdge(derivedFileId, stepId);
+                            jsonGraph.addEdge(derivedFileId, stepId, { class: derivedFileNodeHighlighted ? 'highlighted' : '' });
                         }
                     } else {
                         // File derived from a contributing file; add edges to a coalesced node
@@ -1738,13 +1741,15 @@ export function assembleGraph(files, highlightedFiles, dataset, options, loggedI
                         if (coalescedContributing) {
                             // Rendering a coalesced contributing file.
                             const derivedFileId = `coalesced:${coalescedContributing}`;
+                            const derivedFileNodeHighlighted = (infoNodeId === derivedFileId) || (infoNodeId === stepId);
                             if (!jsonGraph.getEdge(derivedFileId, stepId)) {
-                                jsonGraph.addEdge(derivedFileId, stepId);
+                                jsonGraph.addEdge(derivedFileId, stepId, { class: derivedFileNodeHighlighted ? 'highlighted' : '' });
                             }
                         } else if (usedContributingFiles[derivedFromAtId]) {
                             const derivedFileId = `file:${derivedFromAtId}`;
+                            const derivedFileNodeHighlighted = (infoNodeId === derivedFileId) || (infoNodeId === stepId);
                             if (!jsonGraph.getEdge(derivedFileId, stepId)) {
-                                jsonGraph.addEdge(derivedFileId, stepId);
+                                jsonGraph.addEdge(derivedFileId, stepId, { class: derivedFileNodeHighlighted ? 'highlighted' : '' });
                             }
                         }
                     }
