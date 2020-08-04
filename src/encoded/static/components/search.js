@@ -319,9 +319,9 @@ const ExperimentComponent = (props, reactContext) => {
     // Collect synchronizations
     if (isEnhancerExperiment) {
         if (result.biosamples && result.biosamples.length > 0) {
-            synchronizations = _.uniq(result.biosamples.filter(biosample =>
+            synchronizations = _.uniq(result.biosamples.filter(synchronize =>
                 biosamples && biosamples.synchronization
-            ).map((biosample) => {
+            ).map((synchronize) => {
                 const biosample = biosamples;
                 return `${biosamples.synchronization}${biosamples.post_synchronization_time ? ` + ${biosamples.age_display}` : ''}`;
             }));
