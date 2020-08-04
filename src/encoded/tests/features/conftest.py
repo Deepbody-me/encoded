@@ -1,5 +1,7 @@
 import pytest
+from functools import wraps
 from selenium.webdriver.chrome.options import Options
+
 
 pytest_plugins = [
     'encoded.tests.features.browsersteps',
@@ -27,7 +29,25 @@ def app(app_settings):
         yield app
 
 
-@pytest.mark.fixture_cost(500)
+def load_once(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not wrapper.loaded:
+            wrapper.loaded = True
+            func(*args, **kwargs)
+    wrapper.loaded = False
+    return wrapper
+
+
+@load_once
+def load_index_workbook(testapp):
+    from encoded.loadxl import load_all
+    from pkg_resources import resource_filename
+    inserts = resource_filename('encoded', 'tests/data/inserts/')
+    docsdir = [resource_filename('encoded', 'tests/data/documents/')]
+    load_all(testapp, inserts, docsdir)
+
+
 @pytest.yield_fixture(scope='session')
 def index_workbook(request, app):
     from snovault import DBSESSION
@@ -38,21 +58,13 @@ def index_workbook(request, app):
     cursor = conn.cursor()
     cursor.execute("""TRUNCATE resources, transactions CASCADE;""")
     cursor.close()
-
     from webtest import TestApp
-    log_level = request.config.getoption("--log")
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
     }
     testapp = TestApp(app, environ)
-
-    from encoded.loadxl import load_all
-    from pkg_resources import resource_filename
-    inserts = resource_filename('encoded', 'tests/data/inserts/')
-    docsdir = [resource_filename('encoded', 'tests/data/documents/')]
-    load_all(testapp, inserts, docsdir, log_level=log_level)
-
+    load_index_workbook(testapp)
     testapp.post_json('/index', {'is_testing_full': True})
     yield
     # XXX cleanup
