@@ -6,7 +6,9 @@ elasticsearch running as subprocesses.
 
 import pytest
 
-pytestmark = [pytest.mark.indexing]
+from encoded.tests.features.conftest import index_workbook
+
+pytestmark = [pytest.mark.indexer]
 
 
 def _app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server):
@@ -25,7 +27,7 @@ def _app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server
     settings['queue_server'] = True
     settings['queue_worker'] = True
     settings['queue_worker_processes'] = 2
-    settings['queue_worker_chunk_size'] = 1024
+    settings['queue_worker_chunk_size'] = 256
     settings['queue_worker_batch_size'] = 2000
     settings['visindexer'] = True
     settings['regionindexer'] = True
@@ -109,11 +111,11 @@ def test_indexing_simple(testapp, indexer_testapp):
     assert res.json['txn_count'] == 1
     assert res.json['updated'] == [uuid]
     res = testapp.get('/search/?type=TestingPostPutPatch')
-    assert res.json['total'] == 2
+    assert res.json['total'] >= 2, f'Total {res.json["total"]} not expected'
 
 
 @pytest.mark.slow
-def test_indexing_workbook(testapp, indexer_testapp):
+def test_indexing_workbook(testapp, index_workbook, indexer_testapp):
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
     res = indexer_testapp.post_json('/index', {'record': True})

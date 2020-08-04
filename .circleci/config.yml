@@ -87,6 +87,7 @@ jobs:
           name: non bdd indexing tests
           command: |
             bin/test -s -vv -m "indexing"
+            bin/test -s -vv -m "indexer"
   not-bdd-non-indexing:
     executor: encoded-executor
     resource_class: large
