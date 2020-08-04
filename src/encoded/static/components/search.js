@@ -303,7 +303,7 @@ const ExperimentComponent = (props, reactContext) => {
 
     if (isEnhancerExperiment) {
         if (result.biosamples && result.biosamples.length > 0) {
-            biosamples = _.compact(result.biosamples.map(biosample) => biosamples));
+            biosamples = _.compact(result.biosamples.map(biosample));
         }
     } else {
         if (result.replicates && result.replicates.length > 0) {
@@ -320,7 +320,7 @@ const ExperimentComponent = (props, reactContext) => {
     if (isEnhancerExperiment) {
         if (result.biosamples && result.biosamples.length > 0) {
             synchronizations = _.uniq(result.biosamples.filter(biosample =>
-                replicate.biosamples && replicate.library.biosamples.synchronization
+                biosamples && biosamples.synchronization
             ).map((biosample) => {
                 const biosample = biosamples;
                 return `${biosamples.synchronization}${biosamples.post_synchronization_time ? ` + ${biosamples.age_display}` : ''}`;

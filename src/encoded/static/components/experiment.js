@@ -388,8 +388,8 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     const libraryDocs = [];
     let biosamples = [];
     if (isEnhancerExperiment) {
-        if (biosamples > 0)
-            biosamples = _.compact(biosamples.map(biosample)
+        if (biosamples > 0) {
+            biosamples = _.compact(biosamples.map(biosample))
                 return biosamples;
             return null;
         });
@@ -419,6 +419,7 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     }
 
     // Collect biosample docs.
+    //khine biosamples vs. biosample
     let biosampleDocs = [];
     biosamples.forEach((biosample) => {
         biosampleDocs = biosampleDocs.concat(CollectBiosampleDocs(biosample));
