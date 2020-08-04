@@ -344,7 +344,7 @@ DatasetConstructionPlatform.propTypes = {
 
 
 /**
- * Renders both Experiment and FunctionalCharacterizationExperiment objects.
+ * Renders both Experiment, FunctionalCharacterizationExperiment, TransgenicEnhancerExperiment objects.
  */
 const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactContext) => {
     let condensedReplicates = [];
@@ -355,11 +355,15 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     // Determine whether object is Experiment or FunctionalCharacterizationExperiment.
     const experimentType = context['@type'][0];
     const isFunctionalExperiment = experimentType === 'FunctionalCharacterizationExperiment';
+    const isEnhancerExperiment = experimentType === 'TransgenicEnhancerExperiment';
     let displayType;
     let displayTypeBreadcrumbs;
     if (isFunctionalExperiment) {
         displayTypeBreadcrumbs = 'Functional Characterization Experiments';
         displayType = 'Functional Characterization Experiment';
+    } else if (isEnhancerExperiment) {
+        displayTypeBreadcrumbs = 'Transgenic Enhancer Experiments';
+        displayType = 'Transgenic Enhancer Experiment';
     } else {
         displayTypeBreadcrumbs = 'Experiments';
         displayType = 'Experiment';
@@ -814,6 +818,7 @@ export default Experiment;
 
 globals.contentViews.register(Experiment, 'Experiment');
 globals.contentViews.register(Experiment, 'FunctionalCharacterizationExperiment');
+globals.contentViews.register(Experiment, 'TransgenicEnhancerExperiment');
 
 
 const replicateTableColumns = {
