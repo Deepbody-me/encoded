@@ -6,7 +6,6 @@ elasticsearch running as subprocesses.
 
 import pytest
 
-from encoded.tests.features.conftest import index_workbook
 
 pytestmark = [pytest.mark.indexer]
 
@@ -111,11 +110,11 @@ def test_indexing_simple(testapp, indexer_testapp):
     assert res.json['txn_count'] == 1
     assert res.json['updated'] == [uuid]
     res = testapp.get('/search/?type=TestingPostPutPatch')
-    assert res.json['total'] >= 2, f'Total {res.json["total"]} not expected'
+    assert res.json['total'] == 2
 
 
 @pytest.mark.slow
-def test_indexing_workbook(testapp, index_workbook, indexer_testapp):
+def test_indexing_workbook(testapp, indexer_testapp):
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
     res = indexer_testapp.post_json('/index', {'record': True})
