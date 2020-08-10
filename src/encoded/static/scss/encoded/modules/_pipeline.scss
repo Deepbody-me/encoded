@@ -96,6 +96,12 @@ g.node {
         stroke: #a0a0a0;
         stroke-width: .5px;
     }
+
+    g.decoration {
+        rect {
+            fill: #00f;
+        }
+    }
 }
 
 g.subnodes {

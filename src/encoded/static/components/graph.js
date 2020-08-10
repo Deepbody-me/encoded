@@ -215,6 +215,11 @@ export class Graph extends React.Component {
                     paddingTop: '10',
                     paddingBottom: '10',
                     subnodes: node.subnodes,
+                    decoration: {
+                        id: `${node.id}-highlight`,
+                        position: 'top',
+                        icon: 'arrow-right',
+                    },
                 });
                 if (!parent.root) {
                     subgraph.setParent(node.id, parent.id);
@@ -432,7 +437,7 @@ export class Graph extends React.Component {
         return { viewBoxWidth, viewBoxHeight };
     }
 
-    nodeIdClick(nodeId) {
+    nodeIdClick(nodeId, openInfoModal) {
         let node;
 
         // Find data matching selected node, if any
@@ -459,7 +464,7 @@ export class Graph extends React.Component {
                             this.contributingRequestOutstanding = false;
                             currCoalescedFiles[coalescedNode.metadata.contributing] = contributingFiles;
                             coalescedNode.metadata.coalescedFiles = contributingFiles;
-                            this.props.nodeClickHandler(coalescedNode);
+                            this.props.nodeClickHandler(coalescedNode, openInfoModal);
                             node = null;
                         }).catch(() => {
                             this.contributingRequestOutstanding = false;
@@ -488,7 +493,7 @@ export class Graph extends React.Component {
                                 this.contributingRequestOutstanding = false;
                                 currContributing[node.metadata.contributing] = contributingFile[0];
                                 node.metadata.ref = contributingFile[0];
-                                this.props.nodeClickHandler(node);
+                                this.props.nodeClickHandler(node, openInfoModal);
                                 node = null;
                             }).catch(() => {
                                 this.contributingRequestOutstanding = false;
@@ -503,22 +508,31 @@ export class Graph extends React.Component {
 
         // Tell the upper-level rendering component to render the node information.
         if (node) {
-            this.props.nodeClickHandler(node);
+            this.props.nodeClickHandler(node, openInfoModal);
         }
     }
 
     bindClickHandlers(d3, el) {
         // Add click event listeners to each node rendering. Node's ID is its ENCODE object ID
         const svg = d3.select(el);
-        const nodes = svg.selectAll('g.node');
+        const nodes = svg.selectAll('g.node > rect');
         const subnodes = svg.selectAll('g.subnode circle');
+        const highlights = svg.selectAll('g.node > g.decoration');
 
-        nodes.on('click', (nodeId) => {
-            this.nodeIdClick(nodeId);
+        // Attach click handler to highlight toggles.
+        highlights.on('click', (nodeId) => {
+            this.nodeIdClick(nodeId, false);
         });
+
+        // Attach click handler to file and step nodes.
+        nodes.on('click', (nodeId) => {
+            this.nodeIdClick(nodeId, true);
+        });
+
+        // Attach click handlers to QC bubbles.
         subnodes.on('click', (subnode) => {
             d3.event.stopPropagation();
-            this.nodeIdClick(subnode.id);
+            this.nodeIdClick(subnode.id, true);
         });
     }
 
