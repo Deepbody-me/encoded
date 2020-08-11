@@ -1484,6 +1484,8 @@ def test_metadata_metadata_report_generate(index_workbook, dummy_request):
     mr = MetadataReport(dummy_request)
     response = mr.generate()
     assert isinstance(response, Response)
+    assert response.content_type == 'text/tsv'
+    assert response.content_disposition == 'attachment; filename=metadata.tsv'
     assert len(list(response.body)) >= 100
 
 
