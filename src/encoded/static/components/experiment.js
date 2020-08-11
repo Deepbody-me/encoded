@@ -16,7 +16,7 @@ import { singleTreatment, ItemAccessories, InternalTags } from './objectutils';
 import pubReferenceList from './reference';
 import { SortTablePanel, SortTable } from './sorttable';
 import Status from './status';
-import { BiosampleSummaryString, BiosampleOrganismNames, CollectBiosampleDocs, AwardRef, ReplacementAccessions, ControllingExperiments, ExperimentTable } from './typeutils';
+import { BiosampleSummaryString, BiosampleOrganismNames, CollectBiosampleDocs, AwardRef, ReplacementAccessions, ControllingExperiments, ExperimentTable, BiosampleTable } from './typeutils';
 import ViewControlRegistry, { ViewControlTypes } from './view_controls';
 
 
@@ -352,7 +352,7 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     const adminUser = !!(reactContext.session_properties && reactContext.session_properties.admin);
     const itemClass = globals.itemClass(context, 'view-item');
 
-    // Determine whether object is Experiment or FunctionalCharacterizationExperiment.
+    // Determine whether object is Experiment, FunctionalCharacterizationExperiment or TransgenicEnhancerExperiment.
     const experimentType = context['@type'][0];
     const isFunctionalExperiment = experimentType === 'FunctionalCharacterizationExperiment';
     const isEnhancerExperiment = experimentType === 'TransgenicEnhancerExperiment';
@@ -623,8 +623,8 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                                 </div>
                             : null}
 
-                            
-                            {context.replicates ?
+                            {/* Display library properties for Experiment and FunctionalCharacterizationExperiment only. */}
+                            {!isEnhancerExperiment ?
                                 <React.Fragment>
                                     <LibraryProperties replicates={replicates} />
                                     <DatasetConstructionPlatform context={context} />
@@ -787,7 +787,7 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                                 </div>
                             : null}
 
-                            {context.replicates ?
+                            {!isEnhancerExperiment ?
                                 <LibrarySubmitterComments replicates={replicates} />
                             : null}
 
@@ -806,8 +806,19 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                 <ReplicateTable condensedReplicates={condensedReplicates} replicationType={context.replication_type} />
             : null}
 
-            {/* Display the file widget with the facet, graph, and tables */}
-            <FileGallery context={context} encodevers={encodevers} anisogenic={anisogenic} />
+            {/* Display the file widget with the facet, graph, and tables for Experiment and FunctionalCharacterizationExperiment only. */}
+            {!isEnhancerExperiment ?
+                <FileGallery context={context} encodevers={encodevers} anisogenic={anisogenic} />
+            : null}
+
+            {/* Display the biosample table for TransgenicEnhancerExperiment only. */}
+            {isEnhancerExperiment ?
+                <BiosampleTable
+                    title="Biosamples"
+                    items={context.biosamples}
+                    total={context.biosamples.length}
+                />
+            : null}
 
             <FetchedItems context={context} url={experimentsUrl} Component={ControllingExperiments} />
 
