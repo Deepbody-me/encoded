@@ -482,7 +482,11 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     let nameTip = '';
     const names = organismNames.map((organismName, i) => {
         nameTip += (nameTip.length > 0 ? ' + ' : '') + organismName;
-        nameQuery += `${nameQuery.length > 0 ? '&' : ''}replicates.library.biosample.donor.organism.scientific_name=${organismName}`;
+        if (isEnhancerExperiment) {
+            nameQuery += `${nameQuery.length > 0 ? '&' : ''}biosamples.donor.organism.scientific_name=${organismName}`;
+        } else {
+            nameQuery += `${nameQuery.length > 0 ? '&' : ''}replicates.library.biosample.donor.organism.scientific_name=${organismName}`;
+        }
         return <span key={i}>{i > 0 ? <span> + </span> : null}<i>{organismName}</i></span>;
     });
     const crumbs = [
@@ -619,7 +623,14 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                                 </div>
                             : null}
 
-                            <LibraryProperties replicates={replicates} />
+                            
+                            {context.replicates ?
+                                <React.Fragment>
+                                    <LibraryProperties replicates={replicates} />
+                                    <DatasetConstructionPlatform context={context} />
+                                </React.Fragment>
+                            : null}
+
 
                             {Object.keys(platforms).length > 0 ?
                                 <div data-test="platform">
@@ -634,8 +645,6 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                                     </dd>
                                 </div>
                             : null}
-
-                            <DatasetConstructionPlatform context={context} />
 
                             {context.possible_controls && context.possible_controls.length > 0 ?
                                 <div data-test="possible-controls">
@@ -682,6 +691,28 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                                 <div data-test="elements-cloning">
                                     <dt>Elements cloning</dt>
                                     <dd><a href={context.elements_cloning}>{globals.atIdToAccession(context.elements_cloning)}</a></dd>
+                                </div>
+                            : null}
+
+                            {context.element_location ?
+                                <div data-test="element-location">
+                                    <dt>Element location</dt>
+                                    <dd>{`${context.element_location.assembly} ${context.element_location.chromosome}:${context.element_location.start}-${context.element_location.end}`}</dd>
+                                </div>
+                            : null}
+
+                             {context.tissue_with_enhancer_activity && context.tissue_with_enhancer_activity.length > 0 ?
+                                <div data-test="tissue-with-enhancer-activity">
+                                    <dt>Tissues with enhancer activity</dt>
+                                    <dd>
+                                        <ul>
+                                            {context.tissue_with_enhancer_activity.map(tissue =>
+                                                <li key={tissue}>
+                                                    <span>{tissue}</span>
+                                                </li>
+                                            )}
+                                        </ul>
+                                    </dd>
                                 </div>
                             : null}
                         </dl>
@@ -756,7 +787,9 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                                 </div>
                             : null}
 
-                            <LibrarySubmitterComments replicates={replicates} />
+                            {context.replicates ?
+                                <LibrarySubmitterComments replicates={replicates} />
+                            : null}
 
                             {context.internal_tags && context.internal_tags.length > 0 ?
                                 <div className="tag-badges" data-test="tags">
