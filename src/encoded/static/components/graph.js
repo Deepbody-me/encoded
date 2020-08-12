@@ -519,7 +519,7 @@ export class Graph extends React.Component {
         const subnodes = svg.selectAll('g.subnode circle');
         const highlights = svg.selectAll('g.node > g.decoration');
 
-        // Attach click handler to highlight toggles.
+        // Attach click handler to arrow-highlighting toggles.
         highlights.on('click', (nodeId) => {
             this.nodeIdClick(nodeId, false);
         });

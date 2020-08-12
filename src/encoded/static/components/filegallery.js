@@ -2680,11 +2680,14 @@ class FileGalleryRendererComponent extends React.Component {
     // Handle a click in a graph node. This also handles clicks on the info button of files in the
     // file table.
     handleNodeClick(meta, openInfoModal) {
-        this.setInfoNodeId(meta);
-
         // Open the corresponding info modal if requested.
         if (openInfoModal) {
             this.setInfoNodeVisible(true);
+            this.setInfoNodeId(meta);
+        } else if (this.state.infoNode && (meta.id === this.state.infoNode.id)) {
+            this.setInfoNodeId(null);
+        } else {
+            this.setInfoNodeId(meta);
         }
     }
 
