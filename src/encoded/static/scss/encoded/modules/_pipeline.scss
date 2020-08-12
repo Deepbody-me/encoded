@@ -98,9 +98,19 @@ g.node {
         stroke-width: .5px;
     }
 
-    g.decoration {
+    .decoration {
         rect {
-            fill: #00f;
+            fill: #e0e0e0;
+        }
+
+        &__border {
+            fill: none;
+            stroke-width: 1px;
+            stroke: #a0a0a0;
+        }
+
+        &__icon {
+            fill: #606060;
         }
     }
 }
