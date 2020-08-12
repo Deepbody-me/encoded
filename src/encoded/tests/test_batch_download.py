@@ -12,95 +12,6 @@ from encoded.batch_download import ELEMENT_CHUNK_SIZE
 from encoded.batch_download import get_biosample_accessions
 
 
-param_list_1 = {'files.file_type': 'fastq'}
-param_list_2 = {'files.title': 'ENCFF222JUK'}
-param_list_3 = {'files.assembly': 'GRCh38'}
-exp_file_1 = {'file_type': 'fastq',
-              'assembly': 'hg19',
-              'restricted': True}
-exp_file_2 = {'file_type': 'bam',
-              'restricted': False}
-exp_file_3 = {'file_type': 'gz',
-              'assembly': 'GRCh38'}
-
-
-def test_ELEMENT_CHUNK_SIZE_value():
-    target = 1000
-    expected = ELEMENT_CHUNK_SIZE
-    assert expected == target
-
-
-def test_get_biosample_accessions_finds_accession():
-    expected = {'test_accession'}
-    experiment_json = {
-        'files': [{
-            'uuid': '123',
-            'replicate': {
-                'library': {
-                    'biosample': {
-                        'accession': {
-                            'test_accession'
-                        }
-                    }
-                }
-            }
-        }]
-    }
-    file_json = {
-        'uuid': '123',
-        'replicate': {
-            'library': {
-                'biosample': {
-                    'accession': {
-                        'test_accession'
-                    }
-                }
-            }
-        }
-    }
-    target = get_biosample_accessions(file_json, experiment_json)
-    assert expected == target
-
-def test_get_biosample_accessions_finds_replicate_loop():
-    expected = 'test_replicates'
-    experiment_json = {
-        'replicates': [{
-            'library': {
-                'biosample': {
-                    'accession':
-                        'test_replicates'
-                }
-            }
-        }],
-        'files': [{
-            'uuid': '123',
-            'replicate': {
-                'library': {
-                    'biosample': {
-                        'accession': {
-                            'test_accession'
-                        }
-                    }
-                }
-            },
-        }]
-    }
-    file_json = {
-        'uuid': '1235',
-        'replicate': {
-            'library': {
-                'biosample': {
-                    'accession': {
-                        'test_accession'
-                    }
-                }
-            }
-        }
-    }
-    target = get_biosample_accessions(file_json, experiment_json)
-    assert expected == target
-
-
 def test_format_row():
     columns = ['col1', 'col2', 'col3']
     expected = b'col1\tcol2\tcol3\r\n'
@@ -118,6 +29,7 @@ def test_convert_camel_to_snake_with_one_words():
     expected = 'camel'
     target = _convert_camel_to_snake('Camel')
     assert expected == target
+
 
 @pytest.mark.indexing
 def test_batch_download_report_download(testapp, index_workbook):
@@ -138,6 +50,7 @@ def test_batch_download_report_download(testapp, index_workbook):
     ]
     assert len(lines) == 69
 
+
 @pytest.mark.indexing
 def test_batch_download_matched_set_report_download(testapp, index_workbook):
     res = testapp.get('/report.tsv?type=MatchedSet&sort=accession')
@@ -147,24 +60,11 @@ def test_batch_download_matched_set_report_download(testapp, index_workbook):
     disposition = res.headers['content-disposition']
     assert disposition.startswith('attachment;filename="matched_set_report') and disposition.endswith('.tsv"')
 
-@pytest.mark.indexing
-def test_batch_download_restricted_files_present(testapp, index_workbook):
-    results = testapp.get('/search/?limit=all&field=files.href&field=files.file_type&field=files&type=Experiment')
-    results = results.body.decode("utf-8")
-    results = json.loads(results)
-
-    files_gen = (
-        exp_file
-        for exp in results['@graph']
-        for exp_file in exp.get('files', [])
-    )
-    for exp_file in files_gen:
-        assert exp_file.get('restricted', False) == restricted_files_present(exp_file)
-
 
 def test_batch_download_lookup_column_value(lookup_column_value_item, lookup_column_value_validate):
     for path in lookup_column_value_validate.keys():
         assert lookup_column_value_validate[path] == lookup_column_value(lookup_column_value_item, path)
+
 
 @pytest.mark.indexing
 def test_batch_download_view(testapp, index_workbook):
@@ -176,16 +76,18 @@ def test_batch_download_view(testapp, index_workbook):
     assert len(lines) >= 79
     assert 'http://localhost/files/ENCFF002MXF/@@download/ENCFF002MXF.fastq.gz' in lines
 
+
 @pytest.mark.indexing
 def test_batch_download_header_and_rows(testapp, index_workbook):
     results = testapp.get('/batch_download/?type=Experiment')
     assert results.headers['Content-Type'] == 'text/plain; charset=UTF-8'
     assert results.headers['Content-Disposition'] == 'attachment; filename="files.txt"'
-    lines = results.text.split('\n')
+    lines = results.text.strip().split('\n')
     assert len(lines) > 0
     assert '/metadata/?type=Experiment' in lines[0]
     for line in lines[1:]:
-        assert '@@download' in line
+        assert '@@download' in line, f'{line} not download'
+
 
 @pytest.mark.indexing
 def test_batch_download_view_file_plus(testapp, index_workbook):
@@ -202,7 +104,7 @@ def test_batch_download_view_file_plus(testapp, index_workbook):
 def test_batch_download_contains_all_values(index_workbook, testapp):
     from pkg_resources import resource_filename
     r = testapp.get('/batch_download/?type=Experiment')
-    actual = r.text.split('\n')
+    actual = r.text.strip().split('\n')
     expected_path = resource_filename('encoded', 'tests/data/inserts/expected_batch_download.tsv')
     # To write new expected_batch_download.tsv change 'r' to 'w' and f.write(r.text); return;
     with open(expected_path, 'r') as f:
