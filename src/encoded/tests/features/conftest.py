@@ -65,7 +65,6 @@ def index_workbook(request, app):
     inserts = resource_filename('encoded', 'tests/data/inserts/')
     docsdir = [resource_filename('encoded', 'tests/data/documents/')]
     load_all(testapp, inserts, docsdir, log_level=log_level)
-    indexer_shared_state['index_workbook_loaded'] = True
 
     testapp.post_json('/index', {'is_testing_full': True})
     yield
