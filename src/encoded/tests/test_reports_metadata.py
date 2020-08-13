@@ -4,6 +4,9 @@ from encoded.tests.features.conftest import app, app_settings, index_workbook
 from pyramid.exceptions import HTTPBadRequest
 
 
+pytestmark = [pytest.mark.indexing]
+
+
 def embedded_experiment():
     return {
         '@id': '/experiments/ENCSR434TGY/',
