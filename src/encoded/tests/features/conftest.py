@@ -29,20 +29,26 @@ def app(app_settings):
         yield app
 
 
-def load_once_or_yield(func):
+def load_once(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if not wrapper.loaded:
             wrapper.loaded = True
-            yield from func(*args, **kwargs)
-        else:
-            yield
+            func(*args, **kwargs)
     wrapper.loaded = False
     return wrapper
 
 
+@load_once
+def load_index_workbook(testapp):
+    from encoded.loadxl import load_all
+    from pkg_resources import resource_filename
+    inserts = resource_filename('encoded', 'tests/data/inserts/')
+    docsdir = [resource_filename('encoded', 'tests/data/documents/')]
+    load_all(testapp, inserts, docsdir)
+
+
 @pytest.yield_fixture(scope='session')
-@load_once_or_yield
 def index_workbook(request, app):
     from snovault import DBSESSION
     connection = app.registry[DBSESSION].bind.pool.unique_connection()
@@ -52,20 +58,13 @@ def index_workbook(request, app):
     cursor = conn.cursor()
     cursor.execute("""TRUNCATE resources, transactions CASCADE;""")
     cursor.close()
-
     from webtest import TestApp
-    log_level = request.config.getoption("--log")
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
     }
     testapp = TestApp(app, environ)
-    from encoded.loadxl import load_all
-    from pkg_resources import resource_filename
-    inserts = resource_filename('encoded', 'tests/data/inserts/')
-    docsdir = [resource_filename('encoded', 'tests/data/documents/')]
-    load_all(testapp, inserts, docsdir, log_level=log_level)
-
+    load_index_workbook(testapp)
     testapp.post_json('/index', {'is_testing_full': True})
     yield
     # XXX cleanup
